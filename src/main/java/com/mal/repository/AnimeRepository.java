@@ -6,4 +6,5 @@ import com.mal.entity.AnimeDb;
 
 public interface AnimeRepository  extends JpaRepository<AnimeDb, Integer>{
 
+	AnimeDb findByAnimeName(String animeName);
 }

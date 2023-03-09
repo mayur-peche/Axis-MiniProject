@@ -1,18 +1,15 @@
 package com.mal.service;
-import java.util.List;
-import java.util.Optional;
 
+import java.util.*;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.mal.entity.AnimeDb;
-import com.mal.exception.AnimeNotFoundException;
 import com.mal.repository.AnimeRepository;
-
 
 @Service
 public class AnimeDbServiceImpl implements AnimeDbService{
-	
+
 	@Autowired
 	AnimeRepository animeRepository;
 
@@ -22,44 +19,42 @@ public class AnimeDbServiceImpl implements AnimeDbService{
 	}
 
 	@Override
-	public List<AnimeDb> getAllAnimes() {
+	public List<AnimeDb> getAllAnime() {
 		return animeRepository.findAll();
 	}
-
-	@Override
-	public AnimeDb getAnimeById(int animeId) {  
-		Optional<AnimeDb> anm = animeRepository.findById(animeId);
-		
-        if (anm.isPresent()) 
-            return anm.get();
-        else 
-            throw new AnimeNotFoundException("Anime not found with id");
-	}
-
-	@Override
-	public AnimeDb updateAnimeById(int animeId, AnimeDb animedb) {
-Optional<AnimeDb> anm = animeRepository.findById(animeId);
-		
-        if (anm.isPresent()) 
-            return animeRepository.save(animedb);
-        else 
-            throw new AnimeNotFoundException("Anime not found with id");
-	}
 	
-
 	@Override
-	public String deleteAnimeById(int animeId) {
-Optional<AnimeDb>	anm =  animeRepository.findById(animeId);
+	  public AnimeDb updateAnimeById(int Id, AnimeDb animedb ) {
+	        Optional<AnimeDb> optionalAnime = animeRepository.findById(Id);
+	        if (optionalAnime.isPresent()) {
+	        	AnimeDb existingAnime = optionalAnime.get();
+	            existingAnime.setAnimeName(animedb.getAnimeName());
+	            existingAnime.setGlobalRatings(animedb.getGlobalRatings());
+	            existingAnime.setRanking(animedb.getRanking());
+	            existingAnime.setTotalEpisodes(animedb.getTotalEpisodes());
+	            animeRepository.save(existingAnime);
+	            return existingAnime;
+	        }else {
+	        	throw new EntityNotFoundException("Anime not found with id: " + Id);
+	        }
+	    }
+	
+	@Override
+	public void deleteAnimeById(int Id) {
+		Optional<AnimeDb>	optionalAnime =  animeRepository.findById(Id);
 		
-		if(anm.isPresent())
+		if(optionalAnime.isPresent())
 		{
-			animeRepository.deleteById(animeId);
-			return "anime deleted";
+			animeRepository.deleteById(Id);
 		}
-		else
-			throw new AnimeNotFoundException("no anime present to delete");
+		else {
+			throw new EntityNotFoundException("Anime not found with id: " + Id);		
+			}
 	}
 
-	
-	
+	@Override
+	public AnimeDb getAnimeByName(String animeName) {
+		
+		 return animeRepository.findByAnimeName(animeName);
+	}
 }
