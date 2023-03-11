@@ -7,6 +7,6 @@ public interface AnimeDbService {
 	List<AnimeDb> getAllAnime();
 	AnimeDb getAnimeByName(String animeName);
 	AnimeDb updateAnimeById(int animeId,AnimeDb animedb );
-	void deleteAnimeById(int Id);
+	String deleteAnimeById(int Id);
 	
 }

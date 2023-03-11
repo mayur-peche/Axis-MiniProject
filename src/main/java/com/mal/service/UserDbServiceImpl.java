@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.mal.entity.UserDb;
+import com.mal.exception.CustomConstraintViolationException;
 import com.mal.repository.AnimeRepository;
 import com.mal.repository.UserRepository;
 
@@ -34,12 +35,12 @@ public class UserDbServiceImpl implements UserDbService{
         }
         // Check if user rating is between 1.0 and 10.0
         if (userdb.getUserRating() < 1.0 || userdb.getUserRating() > 10.0) {
-            throw new IllegalArgumentException("User rating should be between 1.0 and 10.0");
+        	 throw new CustomConstraintViolationException("User rating should be between 1.0 and 10.0", null);
         }
 
         // Check if episode progress is negative
         if (userdb.getEpsProgress() < 0 ) {
-            throw new IllegalArgumentException("Episode progress cannot be negative");
+        	throw new CustomConstraintViolationException("Episode progress cannot be negative", null);
         }
 		return userrepository.save(userdb);
 	}
@@ -66,7 +67,6 @@ public class UserDbServiceImpl implements UserDbService{
 		        Set<ConstraintViolation<UserDb>> violations = validator.validateProperty(userDb, "status");
 		        //validates the status property of the UserDb object using the Validator.
 		        //any violations stored in a Set of ConstraintViolation objects that takes UserDb type of object. 
-
 		        
 		        // If violations set<> is not empty , throw a ConstraintViolationException with the error message from iterator
 		        if (!violations.isEmpty()) {
@@ -93,7 +93,7 @@ public class UserDbServiceImpl implements UserDbService{
 	        UserDb userDb = userDbOptional.get();
 	        userDb.setEpsProgress(epsProgress);
 	        userrepository.save(userDb);
-	        return "sucees";
+	        return "succees";
 	    } else {
 	        return "cannot find anime with given id";
 	    }

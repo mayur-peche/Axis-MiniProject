@@ -38,7 +38,8 @@ public class AnimeDbController {
 	}
 	
 	@GetMapping("/animedb/name")
-	public ResponseEntity<AnimeDb> getAnimeByName(@RequestParam("animeName") String animeName) {
+	public ResponseEntity<AnimeDb> getAnimeByName(@RequestBody AnimeDb animedb) {
+		String animeName = animedb.getAnimeName();
 		if (animeName != null) {
 			return new ResponseEntity<AnimeDb>(animedbService.getAnimeByName(animeName), HttpStatus.OK);
 		} else {
@@ -57,9 +58,8 @@ public class AnimeDbController {
 	}
 	
 	@DeleteMapping("/animedb/{id}")
-	public ResponseEntity<Void> deleteAnimeById(@PathVariable("id") int id) {
-		animedbService.deleteAnimeById(id);
-		return ResponseEntity.noContent().build();
+	public ResponseEntity<String> deleteAnimeById(@PathVariable int id) {
+		return new ResponseEntity<String>(animedbService.deleteAnimeById(id), HttpStatus.OK);
 	}
 	
 }

@@ -5,6 +5,7 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.mal.entity.AnimeDb;
+import com.mal.exception.CustomConstraintViolationException;
 import com.mal.repository.AnimeRepository;
 
 @Service
@@ -15,6 +16,17 @@ public class AnimeDbServiceImpl implements AnimeDbService{
 
 	@Override
 	public AnimeDb addAnime(AnimeDb animedb) {
+ 
+        // Check total episode is negative
+        if (animedb.getTotalEpisodes() < 0 ) {
+        	throw new CustomConstraintViolationException("Total episodes cannot be negative", null);
+        }
+        
+        // Check if ranking is already present in AnimeDb
+        AnimeDb animeByRanking = animeRepository.findByRanking(animedb.getRanking());
+        if (animeByRanking != null) {
+            throw new CustomConstraintViolationException("Ranking already exists in AnimeDb", null);
+        }
 		return animeRepository.save(animedb);
 	}
 
@@ -40,12 +52,13 @@ public class AnimeDbServiceImpl implements AnimeDbService{
 	    }
 	
 	@Override
-	public void deleteAnimeById(int Id) {
+	public String deleteAnimeById(int Id) {
 		Optional<AnimeDb>	optionalAnime =  animeRepository.findById(Id);
 		
 		if(optionalAnime.isPresent())
 		{
 			animeRepository.deleteById(Id);
+			return "anime deleted";
 		}
 		else {
 			throw new EntityNotFoundException("Anime not found with id: " + Id);		
@@ -54,7 +67,11 @@ public class AnimeDbServiceImpl implements AnimeDbService{
 
 	@Override
 	public AnimeDb getAnimeByName(String animeName) {
-		
-		 return animeRepository.findByAnimeName(animeName);
+	    AnimeDb anime = animeRepository.findByAnimeName(animeName);
+	    if (anime == null) {
+	        throw new EntityNotFoundException("Anime not found with name: " + animeName);
+	    }
+	    return anime;
 	}
+
 }
