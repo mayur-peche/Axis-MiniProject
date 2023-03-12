@@ -1,5 +1,6 @@
 package com.mal.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,7 +21,7 @@ public class UserDb {
 	@Column(name = "id")
 	private int id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)  //fetch only when required(lazy)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)  				  //fetch only when required(lazy)
 	@JoinColumn(name = "anime_id", referencedColumnName = "id",nullable = false)  //userdb has foreign key column named "anime_id" that use referenced column "id" of the AnimeDb entity
 	private AnimeDb animeDb;
 	

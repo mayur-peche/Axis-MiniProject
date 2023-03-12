@@ -1,12 +1,13 @@
 package com.mal.service;
 import java.util.List;
-import com.mal.entity.AnimeDb;
+
+import com.mal.dto.AnimeDbDto;
 
 public interface AnimeDbService {
-	AnimeDb addAnime(AnimeDb animedb);
-	List<AnimeDb> getAllAnime();
-	AnimeDb getAnimeByName(String animeName);
-	AnimeDb updateAnimeById(int animeId,AnimeDb animedb );
+	AnimeDbDto addAnime(AnimeDbDto animeDbDto);
+	List<AnimeDbDto> getAllAnime();
+	AnimeDbDto getAnimeByName(String animeName);
+	AnimeDbDto updateAnimeById(int animeId,AnimeDbDto animeDbDto );
 	String deleteAnimeById(int Id);
 	
 }

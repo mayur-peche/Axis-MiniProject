@@ -1,8 +1,11 @@
 package com.mal.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
@@ -10,8 +13,12 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.mal.dto.AnimeDbDto;
+import com.mal.dto.UserDbDto;
+import com.mal.entity.AnimeDb;
 import com.mal.entity.UserDb;
 import com.mal.exception.CustomConstraintViolationException;
 import com.mal.repository.AnimeRepository;
@@ -27,30 +34,45 @@ public class UserDbServiceImpl implements UserDbService{
 	 private AnimeRepository animeRepository;
 	 
 	@Override
-	public UserDb addAnimeUser(UserDb userdb) {
+	public UserDbDto addAnimeUser(UserDbDto userDbDto) {
 		
 		// Check if AnimeDb record exists
-        if (!animeRepository.existsById(userdb.getAnimeDb().getId())) {
+        if (!animeRepository.existsById(userDbDto.getAnimeDbDto().getId())) {
             throw new DataIntegrityViolationException("Given anime does not exist in our database. Please try another Anime");
         }
         // Check if user rating is between 1.0 and 10.0
-        if (userdb.getUserRating() < 1.0 || userdb.getUserRating() > 10.0) {
+        if (userDbDto.getUserRating() < 1.0 || userDbDto.getUserRating() > 10.0) {
         	 throw new CustomConstraintViolationException("User rating should be between 1.0 and 10.0", null);
         }
 
         // Check if episode progress is negative
-        if (userdb.getEpsProgress() < 0 ) {
+        if (userDbDto.getEpsProgress() < 0 ) {
         	throw new CustomConstraintViolationException("Episode progress cannot be negative", null);
         }
-		return userrepository.save(userdb);
+        UserDb userDb = convertToEntity(userDbDto);
+        userDb=userrepository.save(userDb);
+        return convertToDto(userDb);
 	}
 
 	@Override
 	public String updateUserRatingById(int id, float userRating) {
-		return null;
-		// TODO Auto-generated method stub
-		
+	    Optional<UserDb> userDbOptional = userrepository.findById(id);
+	    if (userDbOptional.isPresent()) {
+	        UserDb userDb = userDbOptional.get();
+	        
+	        // Check if user rating is between 1.0 and 10.0
+	        if (userRating < 1.0 || userRating > 10.0) {
+	            throw new CustomConstraintViolationException("User rating should be between 1.0 and 10.0", null);
+	        }
+	        
+	        userDb.setUserRating(userRating);
+	        userrepository.save(userDb);
+	        return ("User rating updated successfully.");
+	    } else {
+	        return ("Cannot find anime with given id.");
+	    }
 	}
+
 
 	@Override
 	public String updateStatusByID(int id, String status) {
@@ -101,15 +123,41 @@ public class UserDbServiceImpl implements UserDbService{
 
 
 	@Override
-	public UserDb getAnimeByStatus(String status) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public List<UserDb> getAnimeByStatus(String status) {
+		List<UserDb> anime = userrepository.getAnimeByStatus(status);
+		    if (anime == null) {
+		        throw new EntityNotFoundException("No Anime found with status as :" + status);
+		    }
+		    return anime;
+		}
 
 	@Override
-	public List<UserDb> getAllAnime() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<UserDbDto> getAllAnime() {
+		List<UserDb> userdb = (List<UserDb>)userrepository.findAll();
+		List<UserDbDto> userDbDtos = new ArrayList<>();
+		for(UserDb user : userdb) {
+			userDbDtos.add(convertToDto(user));
+		}
+		return userDbDtos;
+	}
+	
+	private UserDb convertToEntity(UserDbDto userDbDto) {
+	    UserDb userDb = new UserDb();
+	    userDb.setId(userDbDto.getId());
+	    userDb.setUserRating(userDbDto.getUserRating());
+	    userDb.setEpsProgress(userDbDto.getEpsProgress());
+	    userDb.setStatus(userDbDto.getStatus());
+	    return userDb;
 	}
 
+	private UserDbDto convertToDto(UserDb userDb){
+	    UserDbDto userDbDto = new UserDbDto();
+	    userDbDto.setId(userDb.getId());
+	    userDbDto.setUserRating(userDb.getUserRating());
+	    userDbDto.setEpsProgress(userDb.getEpsProgress());
+	    userDbDto.setStatus(userDb.getStatus());
+	    return userDbDto;
+	}
+
+	
 }

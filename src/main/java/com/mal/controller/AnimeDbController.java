@@ -1,6 +1,4 @@
 package com.mal.controller;
-
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mal.entity.AnimeDb;
+import com.mal.dto.AnimeDbDto;
 import com.mal.service.AnimeDbService;
 
 @RestController
@@ -28,30 +25,30 @@ public class AnimeDbController {
 	private AnimeDbService animedbService;
 	
 	@PostMapping("/animedb")
-	public ResponseEntity<AnimeDb> addAnime(@Validated @RequestBody AnimeDb animedb) {
-		return new ResponseEntity<AnimeDb>(animedbService.addAnime(animedb), HttpStatus.OK);
+	public ResponseEntity<AnimeDbDto> addAnime(@Validated @RequestBody AnimeDbDto animeDbDto) {
+		return new ResponseEntity<AnimeDbDto>(animedbService.addAnime(animeDbDto), HttpStatus.OK);
 	}
 	
 	@GetMapping("/animedb")
-	public ResponseEntity<List<AnimeDb>> getAllAnime() {
-		return new ResponseEntity<List<AnimeDb>>(animedbService.getAllAnime(), HttpStatus.OK);
+	public ResponseEntity<List<AnimeDbDto>> getAllAnime() {
+		return new ResponseEntity<List<AnimeDbDto>>(animedbService.getAllAnime(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/animedb/name")
-	public ResponseEntity<AnimeDb> getAnimeByName(@RequestBody AnimeDb animedb) {
-		String animeName = animedb.getAnimeName();
+	public ResponseEntity<AnimeDbDto> getAnimeByName(@RequestBody AnimeDbDto animeDbDto) {
+		String animeName = animeDbDto.getAnimeName();
 		if (animeName != null) {
-			return new ResponseEntity<AnimeDb>(animedbService.getAnimeByName(animeName), HttpStatus.OK);
+			return new ResponseEntity<AnimeDbDto>(animedbService.getAnimeByName(animeName), HttpStatus.OK);
 		} else {
 			return ResponseEntity.notFound().build();
 		}
 	}
 	
 	@PutMapping("/animedb/{id}")
-	public ResponseEntity<AnimeDb> updateAnimeById(@PathVariable("id") int id, @RequestBody AnimeDb animedb) {
-		AnimeDb updatedAnime = animedbService.updateAnimeById(id, animedb);
+	public ResponseEntity<AnimeDbDto> updateAnimeById(@PathVariable("id") int id, @RequestBody AnimeDbDto animeDbDto) {
+		AnimeDbDto updatedAnime = animedbService.updateAnimeById(id, animeDbDto);
 		if (updatedAnime != null) {
-			return new ResponseEntity<AnimeDb>(updatedAnime, HttpStatus.OK);
+			return new ResponseEntity<AnimeDbDto>(updatedAnime, HttpStatus.OK);
 		} else {
 			return ResponseEntity.notFound().build();
 		}
