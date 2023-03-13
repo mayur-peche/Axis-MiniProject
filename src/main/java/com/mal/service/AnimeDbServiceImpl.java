@@ -54,33 +54,23 @@ public class AnimeDbServiceImpl implements AnimeDbService{
 	
 	@Override
 	public AnimeDbDto updateAnimeById(int id, AnimeDbDto animeDbDto) {
-	    Optional<AnimeDb> optionalAnime = animeRepository.findById(id);
-	    if (optionalAnime.isPresent()) {
-	        AnimeDb existingAnime = optionalAnime.get();
-	        existingAnime.setAnimeName(animeDbDto.getAnimeName());
-	        existingAnime.setGlobalRatings(animeDbDto.getGlobalRatings());
-	        existingAnime.setRanking(animeDbDto.getRanking());
-	        existingAnime.setTotalEpisodes(animeDbDto.getTotalEpisodes());
-	        AnimeDb updatedAnime = animeRepository.save(existingAnime);
-	        return convertToDto(updatedAnime); // convert entity to DTO
-	    } else {
-	        throw new EntityNotFoundException("Anime not found with id: " + id);
-	    }
+	    AnimeDb existingAnime = animeRepository.findById(id)
+	        .orElseThrow(() -> new EntityNotFoundException("Anime not found with id: " + id));
+	    existingAnime.setAnimeName(animeDbDto.getAnimeName());
+	    existingAnime.setGlobalRatings(animeDbDto.getGlobalRatings());
+	    existingAnime.setRanking(animeDbDto.getRanking());
+	    existingAnime.setTotalEpisodes(animeDbDto.getTotalEpisodes());
+	    AnimeDb updatedAnime = animeRepository.save(existingAnime);
+	    return convertToDto(updatedAnime);
 	}
 
 	
 	@Override
 	public String deleteAnimeById(int Id) {
-	    Optional<AnimeDb> optionalAnime = animeRepository.findById(Id);
-	    
-	    if(optionalAnime.isPresent())
-	    {
-	        animeRepository.deleteById(Id);
-	        return "anime deleted";
-	    }
-	    else {
-	        throw new EntityNotFoundException("Anime not found with id: " + Id);        
-	    }
+	    AnimeDb anime = animeRepository.findById(Id)
+	        .orElseThrow(() -> new EntityNotFoundException("Anime not found with id: " + Id));
+	    animeRepository.delete(anime);
+	    return "anime deleted";
 	}
 
 
