@@ -67,7 +67,8 @@ public class UserDbServiceImpl implements UserDbService{
 	        
 	        userDb.setUserRating(userRating);
 	        userrepository.save(userDb);
-	        return ("User rating updated successfully.");
+	        UserDbDto userDto = convertToDto(userDb);
+	        return ("User rating updated successfully. " + userDto.toString());
 	    } else {
 	        return ("Cannot find anime with given id.");
 	    }
@@ -123,13 +124,18 @@ public class UserDbServiceImpl implements UserDbService{
 
 
 	@Override
-	public List<UserDb> getAnimeByStatus(String status) {
-		List<UserDb> anime = userrepository.getAnimeByStatus(status);
-		    if (anime == null) {
-		        throw new EntityNotFoundException("No Anime found with status as :" + status);
-		    }
-		    return anime;
-		}
+	public List<UserDbDto> getAnimeByStatus(String status) {
+	    List<UserDb> userdb = (List<UserDb>)userrepository.findByStatus(status);
+	    if (userdb == null) {
+	        throw new EntityNotFoundException("No Anime found with status as :" + status);
+	    }
+	    List<UserDbDto> userDbDtos = new ArrayList<>();
+	    for(UserDb user : userdb) {
+	        userDbDtos.add(convertToDto(user));
+	    }
+	    return userDbDtos;
+	}
+
 
 	@Override
 	public List<UserDbDto> getAllAnime() {
