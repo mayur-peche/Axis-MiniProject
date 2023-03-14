@@ -18,8 +18,12 @@ public class UserDbDto {
 	}
 
 	public int getId() {
-		return id;
+	    if(animeDbDto != null) {
+	        return animeDbDto.getId();
+	    }
+	    return id; // or any other default value
 	}
+
 
 	public void setId(int id) {
 		this.id = id;
@@ -34,6 +38,7 @@ public class UserDbDto {
 	}
 
 	public AnimeDbDto getAnimeDbDto() {
+		
 		return animeDbDto;
 	}
 

@@ -20,22 +20,36 @@ public class AnimeDbServiceImpl implements AnimeDbService{
 	public AnimeDbServiceImpl(AnimeRepository animeRepository) {
 		this.animeRepository = animeRepository;
 	}
+	
+	@Override
+    public AnimeDbDto getAnimeDto(int id) {
+        Optional<AnimeDb> anime = animeRepository.findById(id);
+        if (anime.isPresent()) {
+            AnimeDb animeDb = anime.get();
+            AnimeDbDto animeDbDto = new AnimeDbDto(animeDb.getId(), animeDb.getAnimeName(), animeDb.getRanking(),
+                    animeDb.getGlobalRatings(), animeDb.getTotalEpisodes());
+            return animeDbDto;
+        } else {
+            throw new EntityNotFoundException("Anime with ID " + id + " not found");
+        }
+    }
 
 	@Override
 	public AnimeDbDto addAnime(AnimeDbDto animeDbDto) {
 
+		 AnimeDb animeDb = convertToEntity(animeDbDto); // convert DTO to entity
+		 
 	    // Check total episode is negative
-	    if (animeDbDto.getTotalEpisodes() < 0) {
+	    if (animeDb.getTotalEpisodes() < 0) {
 	        throw new CustomConstraintViolationException("Total episodes cannot be negative", null);
 	    }
 
 	    // Check if ranking is already present in AnimeDbDto
-	    AnimeDbDto animeByRanking = animeRepository.findByRanking(animeDbDto.getRanking());
+	    AnimeDb animeByRanking = animeRepository.findByRanking(animeDb.getRanking());
 	    if (animeByRanking != null) {
 	        throw new CustomConstraintViolationException("Ranking already exists in AnimeDb", null);
 	    }
 
-	    AnimeDb animeDb = convertToEntity(animeDbDto); // convert DTO to entity
 	    animeDb = animeRepository.save(animeDb);
 	    return convertToDto(animeDb); // convert entity to DTO
 	}
@@ -76,14 +90,14 @@ public class AnimeDbServiceImpl implements AnimeDbService{
 
 	@Override
 	public AnimeDbDto getAnimeByName(String animeName) {
-		AnimeDbDto anime = animeRepository.findByAnimeName(animeName);
+		AnimeDb anime = animeRepository.findByAnimeName(animeName);
 	    if (anime == null) {
 	        throw new EntityNotFoundException("Anime not found with name: " + animeName);
 	    }
-	    return anime;
+	    return convertToDto(anime);
 	}
 	
-	private AnimeDb convertToEntity(AnimeDbDto animeDbDto) {
+	AnimeDb convertToEntity(AnimeDbDto animeDbDto) {
 	    AnimeDb animeDb = new AnimeDb();
 	    animeDb.setId(animeDbDto.getId());
 	    animeDb.setAnimeName(animeDbDto.getAnimeName());

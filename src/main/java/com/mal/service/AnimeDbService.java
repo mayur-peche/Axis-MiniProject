@@ -9,5 +9,6 @@ public interface AnimeDbService {
 	AnimeDbDto getAnimeByName(String animeName);
 	AnimeDbDto updateAnimeById(int animeId,AnimeDbDto animeDbDto );
 	String deleteAnimeById(int Id);
+	AnimeDbDto getAnimeDto(int id);
 	
 }

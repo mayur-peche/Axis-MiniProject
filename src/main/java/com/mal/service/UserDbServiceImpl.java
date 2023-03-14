@@ -13,12 +13,10 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.mal.dto.AnimeDbDto;
 import com.mal.dto.UserDbDto;
-import com.mal.entity.AnimeDb;
 import com.mal.entity.UserDb;
 import com.mal.exception.CustomConstraintViolationException;
 import com.mal.repository.AnimeRepository;
@@ -30,29 +28,38 @@ public class UserDbServiceImpl implements UserDbService{
 	@Autowired
 	private UserRepository userrepository;
 	
+	@Autowired
+    private AnimeDbServiceImpl animeDbService;
+	
 	 @Autowired
 	 private AnimeRepository animeRepository;
 	 
-	@Override
-	public UserDbDto addAnimeUser(UserDbDto userDbDto) {
-		
-		// Check if AnimeDb record exists
-        if (!animeRepository.existsById(userDbDto.getAnimeDbDto().getId())) {
-            throw new DataIntegrityViolationException("Given anime does not exist in our database. Please try another Anime");
-        }
-        // Check if user rating is between 1.0 and 10.0
-        if (userDbDto.getUserRating() < 1.0 || userDbDto.getUserRating() > 10.0) {
-        	 throw new CustomConstraintViolationException("User rating should be between 1.0 and 10.0", null);
-        }
+	 @Override
+	    public UserDbDto addAnimeUser(UserDbDto userDbDto) {
 
-        // Check if episode progress is negative
-        if (userDbDto.getEpsProgress() < 0 ) {
-        	throw new CustomConstraintViolationException("Episode progress cannot be negative", null);
-        }
-        UserDb userDb = convertToEntity(userDbDto);
-        userDb=userrepository.save(userDb);
-        return convertToDto(userDb);
-	}
+	        // Check if AnimeDb record exists
+	        AnimeDbDto animeDbDto = animeDbService.getAnimeDto(userDbDto.getAnimeDbDto().getId());
+	        if (animeDbDto == null) {
+	            throw new DataIntegrityViolationException("Given anime does not exist in our database. Please try another Anime");
+	        }
+
+	        // Set the AnimeDbDto object in the UserDbDto
+	        userDbDto.setAnimeDbDto(animeDbDto);
+
+	        // Check if user rating is between 1.0 and 10.0
+	        if (userDbDto.getUserRating() < 1.0 || userDbDto.getUserRating() > 10.0) {
+	            throw new CustomConstraintViolationException("User rating should be between 1.0 and 10.0", null);
+	        }
+
+	        // Check if episode progress is negative
+	        if (userDbDto.getEpsProgress() < 0) {
+	            throw new CustomConstraintViolationException("Episode progress cannot be negative", null);
+	        }
+	        UserDb userDb = convertToEntity(userDbDto);
+	        userDb = userrepository.save(userDb);
+	        return convertToDto(userDb);
+	    }
+
 
 	@Override
 	public String updateUserRatingById(int id, float userRating) {
@@ -150,11 +157,13 @@ public class UserDbServiceImpl implements UserDbService{
 	private UserDb convertToEntity(UserDbDto userDbDto) {
 	    UserDb userDb = new UserDb();
 	    userDb.setId(userDbDto.getId());
+	    userDb.setAnimeDb(animeDbService.convertToEntity(userDbDto.getAnimeDbDto()));
+	    userDb.setStatus(userDbDto.getStatus());
 	    userDb.setUserRating(userDbDto.getUserRating());
 	    userDb.setEpsProgress(userDbDto.getEpsProgress());
-	    userDb.setStatus(userDbDto.getStatus());
 	    return userDb;
 	}
+
 
 	private UserDbDto convertToDto(UserDb userDb){
 	    UserDbDto userDbDto = new UserDbDto();

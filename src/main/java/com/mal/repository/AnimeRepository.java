@@ -10,8 +10,9 @@ public interface AnimeRepository  extends JpaRepository<AnimeDb, Integer>{
 
 	
 	@Query("SELECT a FROM AnimeDb a WHERE a.animeName = :animeName")
-	AnimeDbDto findByAnimeName(String animeName);
+	AnimeDb findByAnimeName(String animeName);
+
 	
-	AnimeDbDto findByRanking(int ranking);
+	AnimeDb findByRanking(int ranking);
 	
 }
