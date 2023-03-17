@@ -46,6 +46,17 @@ public class AnimeDbController {
 		}
 	}
 	
+	@GetMapping("/animedb/{id}")
+	public ResponseEntity<AnimeDbDto> getAnimeById(@PathVariable int id) {
+	    AnimeDbDto anime = animedbService.getAnimeById(id);
+	    if (anime != null) {
+	        return new ResponseEntity<AnimeDbDto>(anime, HttpStatus.OK);
+	    } else {
+	        return ResponseEntity.notFound().build();
+	    }
+	}
+
+	
 	@PutMapping("/animedb/{id}")
 	public ResponseEntity<AnimeDbDto> updateAnimeById(@PathVariable("id") int id, @RequestBody AnimeDbDto animeDbDto) {
 		AnimeDbDto updatedAnime = animedbService.updateAnimeById(id, animeDbDto);

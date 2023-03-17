@@ -117,4 +117,18 @@ public class AnimeDbServiceImpl implements AnimeDbService{
 		return animedbdto;
 	}
 
+	@Override
+	public AnimeDbDto getAnimeById(int id) {
+	    Optional<AnimeDb> anime = animeRepository.findById(id);
+	    if (anime.isPresent()) {
+	        AnimeDb animeDb = anime.get();
+	        AnimeDbDto animeDbDto = new AnimeDbDto(animeDb.getId(), animeDb.getAnimeName(), animeDb.getRanking(),
+	                animeDb.getGlobalRatings(), animeDb.getTotalEpisodes());
+	        return animeDbDto;
+	    } else {
+	        throw new EntityNotFoundException("Anime with ID " + id + " not found");
+	    }
+	}
+
+
 }
