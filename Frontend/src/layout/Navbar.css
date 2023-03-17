@@ -1,0 +1,39 @@
+.bg-custom {
+    background-color: #c7c5c3d7; /* Your custom color */
+}
+
+.btn-outline-custom {
+    color: #000000; /* Your custom color */
+    border-color: #2f52a2; /* Your custom color */
+    border-width: 3px; /* Border thickness */
+    font-weight: bold;
+  }
+
+  .btn-outline-custom:hover,
+  .btn-outline-custom:focus {
+    background-color: #2e51a1; /* Your custom color */
+    color: #ffffff; /* Text color when hovered */
+    font-size: 0.69rem; 
+  }
+  
+  .animedb-btn {
+    font-weight: bold;
+    font-size: 0.78rem;
+    margin-right: 10px;
+  }
+  
+  .other-btn {
+    font-weight: bold;
+    font-size: 0.78rem;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  
+  .btn-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .btn-container-right {
+    margin-left: auto;
+  }
